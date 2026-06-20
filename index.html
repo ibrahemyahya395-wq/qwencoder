@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مساعد المحتوى الذكي</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .input-section {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #555;
+            font-size: 1.1em;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .output-section {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 200px;
+            border: 2px dashed #ddd;
+        }
+
+        .output-section.has-content {
+            border-style: solid;
+            border-color: #667eea;
+        }
+
+        #output {
+            white-space: pre-wrap;
+            line-height: 1.8;
+            color: #444;
+        }
+
+        .placeholder {
+            color: #999;
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 1.5em;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn-primary {
+                width: 100%;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-buttons button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 مساعد المحتوى الذكي</h1>
+            <p>اكتب موضوعك واحصل على محتوى منسق فورًا</p>
+        </header>
+
+        <div class="main-content">
+            <div class="input-section">
+                <label for="topic">أدخل الموضوع:</label>
+                <textarea 
+                    id="topic" 
+                    placeholder="مثال: اكتب لي خطة لتعلم البرمجة في 3 أشهر..."
+                    rows="5"
+                ></textarea>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-primary" id="generateBtn" onclick="generateContent()">
+                    ✨ إنشاء المحتوى
+                </button>
+            </div>
+
+            <div class="output-section" id="outputSection">
+                <div class="placeholder" id="placeholder">
+                    <p>📝 النتيجة ستظهر هنا...</p>
+                    <p style="margin-top: 10px; font-size: 0.9em;">اكتب موضوعًا واضغط على زر الإنشاء</p>
+                </div>
+                <div id="output"></div>
+            </div>
+
+            <div class="action-buttons hidden" id="actionButtons">
+                <button class="btn-secondary" onclick="copyToClipboard()">
+                    📋 نسخ النص
+                </button>
+                <button class="btn-secondary" onclick="downloadAsTXT()">
+                    💾 تحميل كملف TXT
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="https://js.puter.com/v2/"></script>
+    <script>
+        let currentOutput = '';
+
+        async function generateContent() {
+            const topic = document.getElementById('topic').value.trim();
+            const outputDiv = document.getElementById('output');
+            const placeholder = document.getElementById('placeholder');
+            const generateBtn = document.getElementById('generateBtn');
+            const actionButtons = document.getElementById('actionButtons');
+            const outputSection = document.getElementById('outputSection');
+
+            if (!topic) {
+                showToast('⚠️ الرجاء كتابة موضوع أولاً');
+                return;
+            }
+
+            // Show loading state
+            generateBtn.disabled = true;
+            generateBtn.textContent = '⏳ جاري الإنشاء...';
+            placeholder.classList.add('hidden');
+            outputDiv.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>جاري إنشاء المحتوى...</p>
+                </div>
+            `;
+            outputSection.classList.remove('has-content');
+            actionButtons.classList.add('hidden');
+
+            try {
+                // Call Puter AI Chat
+                const response = await puter.ai.chat(topic);
+                currentOutput = response.message.content;
+
+                // Display the result
+                outputDiv.textContent = currentOutput;
+                outputSection.classList.add('has-content');
+                actionButtons.classList.remove('hidden');
+                
+                showToast('✅ تم إنشاء المحتوى بنجاح!');
+            } catch (error) {
+                console.error('Error:', error);
+                outputDiv.textContent = '❌ حدث خطأ أثناء إنشاء المحتوى. يرجى المحاولة مرة أخرى.';
+                showToast('❌ حدث خطأ');
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = '✨ إنشاء المحتوى';
+            }
+        }
+
+        function copyToClipboard() {
+            if (!currentOutput) {
+                showToast('⚠️ لا يوجد نص لنسخه');
+                return;
+            }
+
+            navigator.clipboard.writeText(currentOutput).then(() => {
+                showToast('📋 تم النسخ إلى الحافظة!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                showToast('❌ فشل النسخ');
+            });
+        }
+
+        function downloadAsTXT() {
+            if (!currentOutput) {
+                showToast('⚠️ لا يوجد نص لتحميله');
+                return;
+            }
+
+            const blob = new Blob([currentOutput], { encoding: 'UTF-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'المحتوى-المنشأ.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('💾 تم تحميل الملف بنجاح!');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Allow Enter key to trigger generation (with Ctrl/Cmd)
+        document.getElementById('topic').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                generateContent();
+            }
+        });
+    </script>
+</body>
+</html>
